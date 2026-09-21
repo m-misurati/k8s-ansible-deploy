@@ -1,0 +1,41 @@
+
+- name: install and configure containerd
+  hosts: k8s_cluster
+  become: true
+
+  tasks:
+    - name: install dnf plugins
+      ansible.builtin.dnf:
+        name: dnf-plugins-core
+        state: present
+
+    - name: add Docker CE repository
+      ansible.builtin.command:
+        cmd: dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+    - name: install containerd
+      ansible.builtin.dnf:
+        name: containerd.io
+        state: present
+
+    - name: create containerd config directory
+      ansible.builtin.file:
+        path: /etc/containerd
+        state: directory
+        mode: '0755'
+
+    - name: generate default containerd configuration
+      ansible.builtin.shell:
+        cmd: containerd config default > /etc/containerd/config.toml
+
+    - name: enable SystemdCgroup
+      ansible.builtin.replace:
+        path: /etc/containerd/config.toml
+        regexp: 'SystemdCgroup = false'
+        replace: 'SystemdCgroup = true'
+
+    - name: enable and restart containerd
+      ansible.builtin.systemd:
+        name: containerd
+        enabled: true
+        state: restarted

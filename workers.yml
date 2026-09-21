@@ -1,0 +1,10 @@
+
+- name: join workers to Kubernetes cluster
+  hosts: k8s_workers
+  become: true
+
+  tasks:
+    - name: join worker to cluster
+      ansible.builtin.command:
+        cmd: "{{ hostvars['k8s-master']['join_command']['stdout'] }}"
+        creates: /etc/kubernetes/kubelet.conf

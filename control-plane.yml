@@ -1,0 +1,39 @@
+
+- name: initialize Kubernetes control plane
+  hosts: k8s_master
+  become: true
+
+  tasks:
+    - name: initialize control plane with kubeadm
+      ansible.builtin.command:
+        cmd: kubeadm init --apiserver-advertise-address={{ master_ip }} --pod-network-cidr={{ pod_network_cidr }}
+        creates: /etc/kubernetes/admin.conf
+
+    - name: create kube directory for cluster user
+      ansible.builtin.file:
+        path: "/home/{{ cluster_user }}/.kube"
+        state: directory
+        owner: "{{ cluster_user }}"
+        group: "{{ cluster_user }}"
+        mode: '0755'
+
+    - name: copy kubeconfig
+      ansible.builtin.copy:
+        src: /etc/kubernetes/admin.conf
+        dest: "/home/{{ cluster_user }}/.kube/config"
+        remote_src: true
+        owner: "{{ cluster_user }}"
+        group: "{{ cluster_user }}"
+        mode: '0600'
+
+    - name: install Calico
+      ansible.builtin.command:
+        cmd: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.31.0/manifests/calico.yaml
+      environment:
+        KUBECONFIG: "/home/{{ cluster_user }}/.kube/config"
+
+    - name: generate join command
+      ansible.builtin.command:
+        cmd: kubeadm token create --print-join-command
+      register: join_command                              #Save the output of this task into a variable called join_command.
+      changed_when: false

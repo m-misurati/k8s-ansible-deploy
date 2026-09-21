@@ -1,0 +1,38 @@
+
+- name: install Kubernetes packages
+  hosts: k8s_cluster
+  become: true
+
+  tasks:
+    - name: add Kubernetes repository
+      ansible.builtin.copy:
+        dest: /etc/yum.repos.d/kubernetes.repo
+        content: |
+          [kubernetes]
+          name=Kubernetes
+          baseurl=https://pkgs.k8s.io/core:/stable:/v1.36/rpm/
+          enabled=1
+          gpgcheck=1
+          gpgkey=https://pkgs.k8s.io/core:/stable:/v1.36/rpm/repodata/repomd.xml.key
+          exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
+        mode: '0644'
+
+    - name: install kubelet kubeadm kubectl
+      ansible.builtin.dnf:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+        disable_excludes: kubernetes
+
+    - name: enable kubelet
+      ansible.builtin.systemd:
+        name: kubelet
+        enabled: true
+
+    - name: disable firewalld
+      ansible.builtin.systemd:
+        name: firewalld
+        enabled: false
+        state: stopped

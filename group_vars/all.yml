@@ -1,0 +1,7 @@
+master_ip: "172.20.10.9"
+worker1_ip: "172.20.10.12"
+worker2_ip: "172.20.10.14"
+
+pod_network_cidr: "192.168.0.0/16"
+
+cluster_user: "sajida"
