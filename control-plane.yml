@@ -6,7 +6,7 @@
   tasks:
     - name: initialize control plane with kubeadm
       ansible.builtin.command:
-        cmd: kubeadm init --apiserver-advertise-address={{ master_ip }} --pod-network-cidr={{ pod_network_cidr }}
+        cmd: kubeadm init --apiserver-advertise-address={{ cp1_ip }} --pod-network-cidr={{ pod_network_cidr }}
         creates: /etc/kubernetes/admin.conf
 
     - name: create kube directory for cluster user

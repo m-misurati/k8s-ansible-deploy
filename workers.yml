@@ -6,5 +6,5 @@
   tasks:
     - name: join worker to cluster
       ansible.builtin.command:
-        cmd: "{{ hostvars['k8s-master']['join_command']['stdout'] }}"
+        cmd: "{{ hostvars[groups['k8s_master'][0]]['join_command']['stdout'] }}"
         creates: /etc/kubernetes/kubelet.conf
