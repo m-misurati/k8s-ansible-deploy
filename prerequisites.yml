@@ -45,9 +45,9 @@
         line: 'SELINUX=permissive'
 
     - name: load overlay and br_netfilter kernel modules       # troubleshooting: not in the actual assignment but prerequisite for sysctl tasks
-      community.general.modprobe:
-        name: "{{ item }}"
-        state: present
+      ansible.builtin.command:
+        cmd: "modprobe {{ item }}"
+      changed_when: false                                      # modprobe is idempotent; loading an already-loaded module is a no-op
       loop:
         - overlay
         - br_netfilter
