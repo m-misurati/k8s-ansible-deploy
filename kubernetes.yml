@@ -31,8 +31,12 @@
         name: kubelet
         enabled: true
 
+    - name: gather service facts
+      ansible.builtin.service_facts:
+
     - name: disable firewalld
       ansible.builtin.systemd:
         name: firewalld
         enabled: false
         state: stopped
+      when: "'firewalld.service' in ansible_facts.services"    # skip on hosts where firewalld is not installed
