@@ -3,5 +3,5 @@ w1_ip: "10.0.1.11"
 
 pod_network_cidr: "192.168.0.0/16"
 
-cluster_user: "rocky"
+cluster_user: "mohamed"
 ansible_user: "{{ cluster_user }}"
